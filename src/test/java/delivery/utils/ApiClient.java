@@ -2,21 +2,21 @@ package delivery.utils;
 
 import com.google.gson.Gson;
 import delivery.api.BaseSetupApi;
-import delivery.dto.LoginDto;
+import delivery.dto.DecisionDto;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
 
 public class ApiClient extends BaseSetupApi {
-    public static Response getOrders(RequestSpecification spec){
+    public static Response getLoanDetails(String amountValue,String PeriodValue){
 
         return given()
-                .spec(spec)
                 .log()
                 .all()
-                .get( "orders")
+                .queryParam("amount","500")
+                .queryParam("period","12")
+                .get( "/api/loan-calc")
                 .then()
                 .log()
                 .all()
@@ -24,20 +24,19 @@ public class ApiClient extends BaseSetupApi {
                 .response();
     }
 
-    public static String authorizeAndGetToken(String username, String password){
+    public static Response postCalcDecision(){
 
         return given()
                 .log()
                 .all()
                 .contentType(ContentType.JSON)
-                .body( new Gson().toJson( new LoginDto(username,password) ) )
-                .post("login/student" )
+                .body( new Gson().toJson( new DecisionDto(1000,0,true,500,12,40) ) )
+                .post("api/loan-calc/decision" )
                 .then()
                 .log()
                 .all()
                 .extract()
-                .response()
-                .asString();
+                .response();
     }
 
 }
